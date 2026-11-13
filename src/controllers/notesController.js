@@ -18,10 +18,6 @@ export const getNoteById = async (req, res, next) => {
 
 export const createNote = async (req, res, next) => {
   const note = await Note.create(req.body);
-
-  if (!note) {
-    throw createHttpError(404, 'Note not found');
-  }
   res.status(201).json(note);
 };
 
