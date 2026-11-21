@@ -2,7 +2,9 @@ import { Note } from '../models/note.js';
 import createHttpError from 'http-errors';
 
 export const getAllNotes = async (req, res, next) => {
-  const { tag, search } = req.query;
+  const { page = 1, perPage = 10, tag, search } = req.query;
+
+  const skip = (page - 1) * perPage;
 
   const filter = {};
 
@@ -17,8 +19,16 @@ export const getAllNotes = async (req, res, next) => {
     ];
   }
 
-  const notes = await Note.find(filter);
-  res.status(200).json({ notes });
+  const notesQuery = Note.find(filter);
+
+  const [totalNotes, notes] = await Promise.all([
+    notesQuery.clone().countDocuments(),
+    notesQuery.skip(skip).limit(perPage),
+  ]);
+
+  const totalPages = Math.ceil(totalNotes / perPage);
+
+  res.status(200).json({ page, perPage, totalNotes, totalPages, notes });
 };
 
 export const getNoteById = async (req, res, next) => {
