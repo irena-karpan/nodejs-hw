@@ -18,10 +18,15 @@ const notesSchema = new Schema(
       enum: TAGS,
       default: 'Todo',
     },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
   },
   { timestamps: true, versionKey: false },
 );
 
-notesSchema.index({ tag: 1 });
+notesSchema.index({ userId: 1, tag: 1 });
 
 export const Note = model('Note', notesSchema);
